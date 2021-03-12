@@ -120,10 +120,6 @@ class CrypticSitePredictor():
  
         self.df_rsasa = self.df_sasa.apply(to_rSASA_each_series)
 
-    def run(self):
-        self.run_SASA()
-        self.to_rSASA()
-
     def ratio_RbRe(self, rSASA, buried_upper_limit):
         """
         Args:
@@ -154,18 +150,52 @@ class CrypticSitePredictor():
 
         return Rbe
 
+    def generate_cryptic_site_index(self):
+        """
+            df_rsasa: dataframe (e.g., {PHE1:0.4, TYR2:0.2,...})
+            self.cryptic_index: [dict] delta F and sigma are assigned to each aromatic residue
+        Note: this function works only for the aromatic residues.
+        """
+        S_aromatic_resname = set(['PHE','TRP','TYR','HIS'])
+        self.cryptic_index       = {}
+        for key in self.df_rsasa:
+
+            if key[0:3] in S_aromatic_resname:
+
+                # -- Calculate the ratio (Rbe) of buried to exposed states
+                Rbe = self.ratio_RbRe(self.df_rsasa[key], self.__threshold)
+                RT = 0.59 # at 300 K
+                
+                if Rbe == np.inf:
+                    dF = - np.inf
+
+                else:
+                    dF = - RT * np.log(Rbe)
+
+                std_sasa = np.std(self.df_rsasa[key])
+                
+                self.cryptic_index[key] = (dF, std_sasa)
+
+        #self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:int(x[0][3:-1])) # sorted by residue number
+        self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:x[1]) # sorted by sigma 
+
+    def run(self):
+        self.run_SASA()
+        self.to_rSASA()
+    
     def predict(self, verbose=False):
         '''
         From RSASA, it predicts high score aromatic residues
         '''
-        pass
+        self.generate_cryptic_site_index()
 
 def main():
     CSP = CrypticSitePredictor()
     CSP.print_info()
     CSP.run()
-    CSP.df_rsasa.to_csv('rsasa.csv')
-    #CSP.run_SASA()
+    CSP.predict()
+    print(CSP.cryptic_index)
+#    CSP.df_rsasa.to_csv('rsasa.csv')
 
 if __name__ == '__main__':
     main()
