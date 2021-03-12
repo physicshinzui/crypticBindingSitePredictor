@@ -38,9 +38,25 @@ class CrypticSitePredictor():
         '''
         print(info)
 
-    def rSASA_calculation(self):
-        traj = md.load(__traj, top = __ref)
-        pass
+    def run_SASA(self):
+        probe_radius, n_sphere_points = 0.14, 100
+        print(self.__traj_data)
+
+        # keys = get_residue_tag(top)
+        # print(keys)
+        
+        # trj_sasa = md.shrake_rupley(traj,
+        #                             probe_radius    = probe_radius   ,
+        #                             n_sphere_points = n_sphere_points, # the default value of gmx sasa is 24 
+        #                             mode='residue')
+
+        # print('sasa data shape', trj_sasa.shape)
+        # print(len(trj_sasa[0,:]))
+        # df = pd.DataFrame(trj_sasa).round(4)
+        # df.columns = keys    
+        # df.index.name = 'Frame No'
+        # df.to_csv('sasa.csv')
+
 
     def run(self, verbose=False):
         pass
@@ -87,6 +103,7 @@ class CrypticSitePredictor():
 def main():
     CSP = CrypticSitePredictor()
     CSP.print_info()
-    
+    CSP.run_SASA()
+
 if __name__ == '__main__':
     main()
