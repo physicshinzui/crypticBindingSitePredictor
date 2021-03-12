@@ -63,19 +63,19 @@ class CrypticSitePredictor():
         keys = get_residue_tag()
         print(keys)
         
-        self.sasa_matrix = md.shrake_rupley(self.__traj_data,
+        sasa_matrix = md.shrake_rupley(self.__traj_data,
                                     probe_radius    = PROBE_RADIUS   ,
                                     n_sphere_points = N_SPHERE_POINTS,
                                     mode='residue')
 
-        print('sasa data shape', self.sasa_matrix.shape)
-        print(len(self.sasa_matrix[0,:]))
+        print('sasa data shape', sasa_matrix.shape)
+        print(len(sasa_matrix[0,:]))
         
         ### Save a table storing sasa values
-        df = pd.DataFrame(self.sasa_matrix).round(4)
-        df.columns = keys    
-        df.index.name = 'Frame No'
-        df.to_csv('sasa.csv')
+        self.df_sasa = pd.DataFrame(sasa_matrix).round(4)
+        self.df_sasa.columns = keys    
+        self.df_sasa.index.name = 'Frame No'
+        #self.df_sasa.to_csv('sasa.csv')
 
     def to_rSASA(self):
         # The values were computed by mdtraj's sasa class.
@@ -88,34 +88,41 @@ class CrypticSitePredictor():
                                    'TRP': 2.57,
                                    'HIS': 1.90,
                                    'ARG': 2.39}
-        key = self.sasa_matrix.name
-        
-        if key[0:3] == 'PHE':
-            print(key)
-            rSASA = self.sasa_matrix / sasa_values_of_naked_aa['PHE']
 
-        elif key[0:3] == 'TYR':
-            print(key)
-            rSASA = self.sasa_matrix / sasa_values_of_naked_aa['TYR']
+        def to_rSASA_each_series(ser_sasa):
+            key = ser_sasa.name
+            
+            if key[0:3] == 'PHE':
+                print(key)
+                rsasa= ser_sasa / sasa_values_of_naked_aa['PHE']
 
-        elif key[0:3] == 'TRP':
-            print(key)
-            rSASA = self.sasa_matrix / sasa_values_of_naked_aa['TRP']
+            elif key[0:3] == 'TYR':
+                print(key)
+                rsasa= ser_sasa / sasa_values_of_naked_aa['TYR']
 
-        elif key[0:3] == 'HIS':
-            print(key)
-            rSASA = self.sasa_matrix / sasa_values_of_naked_aa['HIS']
+            elif key[0:3] == 'TRP':
+                print(key)
+                rsasa= ser_sasa / sasa_values_of_naked_aa['TRP']
 
-        elif key[0:3] == 'ARG':
-            print(key)
-            rSASA = self.sasa_matrix / sasa_values_of_naked_aa['ARG']
+            elif key[0:3] == 'HIS':
+                print(key)
+                rsasa= ser_sasa / sasa_values_of_naked_aa['HIS']
 
-        else:
-            print(f'{key} was not converted, because non-aromatic aa are not handled by this program.')        
-            rSASA = self.sasa_matrix
+            elif key[0:3] == 'ARG':
+                print(key)
+                rsasa= ser_sasa / sasa_values_of_naked_aa['ARG']
 
-        return rSASA
+            else:
+                print(f'{key} was not converted, because non-aromatic aa are not handled by this program.')        
+                rsasa= ser_sasa
+ 
+            return rsasa
+ 
+        self.df_rsasa = self.df_sasa.apply(to_rSASA_each_series)
 
+    def run(self):
+        self.run_SASA()
+        self.to_rSASA()
 
     def ratio_RbRe(self, rSASA, buried_upper_limit):
         """
@@ -153,11 +160,12 @@ class CrypticSitePredictor():
         '''
         pass
 
-
 def main():
     CSP = CrypticSitePredictor()
     CSP.print_info()
-    CSP.run_SASA()
+    CSP.run()
+    CSP.df_rsasa.to_csv('rsasa.csv')
+    #CSP.run_SASA()
 
 if __name__ == '__main__':
     main()
