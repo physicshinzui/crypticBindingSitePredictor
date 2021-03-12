@@ -56,6 +56,7 @@ class CrypticSitePredictor():
             nchains = len(set(u.select_atoms('protein').segids))
             print(f'n chains = {nchains}')
             for chain, resn, resi in zip(u.residues.segids, u.residues.resnames, u.residues.resids):
+                if chain == 'SYSTEM': chain = chain.replace('SYSTEM', 'A')
                 residue_tags.append(resn+str(resi)+chain)
             return residue_tags
 
@@ -69,6 +70,8 @@ class CrypticSitePredictor():
 
         print('sasa data shape', self.sasa_matrix.shape)
         print(len(self.sasa_matrix[0,:]))
+        
+        ### Save a table storing sasa values
         df = pd.DataFrame(self.sasa_matrix).round(4)
         df.columns = keys    
         df.index.name = 'Frame No'
@@ -85,31 +88,31 @@ class CrypticSitePredictor():
                                    'TRP': 2.57,
                                    'HIS': 1.90,
                                    'ARG': 2.39}
-        key = sasa_series.name
+        key = self.sasa_matrix.name
         
         if key[0:3] == 'PHE':
             print(key)
-            rSASA = sasa_series / sasa_values_of_naked_aa['PHE']
+            rSASA = self.sasa_matrix / sasa_values_of_naked_aa['PHE']
 
         elif key[0:3] == 'TYR':
             print(key)
-            rSASA = sasa_series / sasa_values_of_naked_aa['TYR']
+            rSASA = self.sasa_matrix / sasa_values_of_naked_aa['TYR']
 
         elif key[0:3] == 'TRP':
             print(key)
-            rSASA = sasa_series / sasa_values_of_naked_aa['TRP']
+            rSASA = self.sasa_matrix / sasa_values_of_naked_aa['TRP']
 
         elif key[0:3] == 'HIS':
             print(key)
-            rSASA = sasa_series / sasa_values_of_naked_aa['HIS']
+            rSASA = self.sasa_matrix / sasa_values_of_naked_aa['HIS']
 
         elif key[0:3] == 'ARG':
             print(key)
-            rSASA = sasa_series / sasa_values_of_naked_aa['ARG']
+            rSASA = self.sasa_matrix / sasa_values_of_naked_aa['ARG']
 
         else:
             print(f'{key} was not converted, because non-aromatic aa are not handled by this program.')        
-            rSASA = sasa_series
+            rSASA = self.sasa_matrix
 
         return rSASA
 
@@ -150,8 +153,6 @@ class CrypticSitePredictor():
         '''
         pass
 
-
-        pass
 
 def main():
     CSP = CrypticSitePredictor()
