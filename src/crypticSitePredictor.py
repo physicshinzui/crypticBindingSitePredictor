@@ -39,7 +39,8 @@ class CrypticSitePredictor():
         print(info)
 
     def run_SASA(self):
-        probe_radius, n_sphere_points = 0.14, 100
+        import pandas as pd
+        PROBE_RADIUS, N_SPHERE_POINTS = 0.14, 100
         print(self.__traj_data)
 
         def get_residue_tag():
@@ -61,17 +62,17 @@ class CrypticSitePredictor():
         keys = get_residue_tag()
         print(keys)
         
-        # trj_sasa = md.shrake_rupley(traj,
-        #                             probe_radius    = probe_radius   ,
-        #                             n_sphere_points = n_sphere_points, # the default value of gmx sasa is 24 
-        #                             mode='residue')
+        trj_sasa = md.shrake_rupley(self.__traj_data,
+                                    probe_radius    = PROBE_RADIUS   ,
+                                    n_sphere_points = N_SPHERE_POINTS,
+                                    mode='residue')
 
-        # print('sasa data shape', trj_sasa.shape)
-        # print(len(trj_sasa[0,:]))
-        # df = pd.DataFrame(trj_sasa).round(4)
-        # df.columns = keys    
-        # df.index.name = 'Frame No'
-        # df.to_csv('sasa.csv')
+        print('sasa data shape', trj_sasa.shape)
+        print(len(trj_sasa[0,:]))
+        df = pd.DataFrame(trj_sasa).round(4)
+        df.columns = keys    
+        df.index.name = 'Frame No'
+        df.to_csv('sasa.csv')
 
 
     def run(self, verbose=False):
