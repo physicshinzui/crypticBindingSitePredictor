@@ -42,8 +42,24 @@ class CrypticSitePredictor():
         probe_radius, n_sphere_points = 0.14, 100
         print(self.__traj_data)
 
-        # keys = get_residue_tag(top)
-        # print(keys)
+        def get_residue_tag():
+            """
+            Todo:
+                I want to do this function by mdtraj instead of MDAnalysis
+            Return:
+                residue_tags: List; e.g, [PHE1A, ARG2A, ...]
+            """
+            from MDAnalysis import Universe 
+            u = Universe(self.__ref)
+            residue_tags = []
+            nchains = len(set(u.select_atoms('protein').segids))
+            print(f'n chains = {nchains}')
+            for chain, resn, resi in zip(u.residues.segids, u.residues.resnames, u.residues.resids):
+                residue_tags.append(resn+str(resi)+chain)
+            return residue_tags
+
+        keys = get_residue_tag()
+        print(keys)
         
         # trj_sasa = md.shrake_rupley(traj,
         #                             probe_radius    = probe_radius   ,
