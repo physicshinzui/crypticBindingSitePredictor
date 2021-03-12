@@ -62,21 +62,57 @@ class CrypticSitePredictor():
         keys = get_residue_tag()
         print(keys)
         
-        trj_sasa = md.shrake_rupley(self.__traj_data,
+        self.sasa_matrix = md.shrake_rupley(self.__traj_data,
                                     probe_radius    = PROBE_RADIUS   ,
                                     n_sphere_points = N_SPHERE_POINTS,
                                     mode='residue')
 
-        print('sasa data shape', trj_sasa.shape)
-        print(len(trj_sasa[0,:]))
-        df = pd.DataFrame(trj_sasa).round(4)
+        print('sasa data shape', self.sasa_matrix.shape)
+        print(len(self.sasa_matrix[0,:]))
+        df = pd.DataFrame(self.sasa_matrix).round(4)
         df.columns = keys    
         df.index.name = 'Frame No'
         df.to_csv('sasa.csv')
 
+    def to_rSASA(self):
+        # The values were computed by mdtraj's sasa class.
+        # unit, nm^2
+        # Note: Relative SASAs of non-aromatic residues are NOT computed.
 
-    def run(self, verbose=False):
-        pass
+        # These values were caluculated for an ALA-X-ALA tripeptide.
+        sasa_values_of_naked_aa = {'PHE': 2.15,
+                                   'TYR': 2.30,
+                                   'TRP': 2.57,
+                                   'HIS': 1.90,
+                                   'ARG': 2.39}
+        key = sasa_series.name
+        
+        if key[0:3] == 'PHE':
+            print(key)
+            rSASA = sasa_series / sasa_values_of_naked_aa['PHE']
+
+        elif key[0:3] == 'TYR':
+            print(key)
+            rSASA = sasa_series / sasa_values_of_naked_aa['TYR']
+
+        elif key[0:3] == 'TRP':
+            print(key)
+            rSASA = sasa_series / sasa_values_of_naked_aa['TRP']
+
+        elif key[0:3] == 'HIS':
+            print(key)
+            rSASA = sasa_series / sasa_values_of_naked_aa['HIS']
+
+        elif key[0:3] == 'ARG':
+            print(key)
+            rSASA = sasa_series / sasa_values_of_naked_aa['ARG']
+
+        else:
+            print(f'{key} was not converted, because non-aromatic aa are not handled by this program.')        
+            rSASA = sasa_series
+
+        return rSASA
+
 
     def ratio_RbRe(self, rSASA, buried_upper_limit):
         """
