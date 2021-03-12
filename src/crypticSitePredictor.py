@@ -56,8 +56,11 @@ class CrypticSitePredictor():
             nchains = len(set(u.select_atoms('protein').segids))
             print(f'n chains = {nchains}')
             for chain, resn, resi in zip(u.residues.segids, u.residues.resnames, u.residues.resids):
-                if chain == 'SYSTEM': chain = chain.replace('SYSTEM', 'A')
-                residue_tags.append(resn+str(resi)+chain)
+            
+                if chain == 'SYSTEM': self.chain = chain.replace('SYSTEM', 'A') # self.chain should have default vaule in __init__
+                 
+                residue_tags.append(resn + str(resi) + self.chain)
+            
             return residue_tags
 
         keys = get_residue_tag()
@@ -149,6 +152,10 @@ class CrypticSitePredictor():
             Rbe = np.sum(Pb) / np.sum(Pe) # R_eb, the more it is, the more exposed and vice versa.
 
         return Rbe
+    
+    def run(self):
+        self.run_SASA()
+        self.to_rSASA()
 
     def generate_cryptic_site_index(self):
         """
@@ -157,7 +164,7 @@ class CrypticSitePredictor():
         Note: this function works only for the aromatic residues.
         """
         S_aromatic_resname = set(['PHE','TRP','TYR','HIS'])
-        self.cryptic_index       = {}
+        self.cryptic_index = {}
         for key in self.df_rsasa:
 
             if key[0:3] in S_aromatic_resname:
@@ -177,25 +184,42 @@ class CrypticSitePredictor():
                 self.cryptic_index[key] = (dF, std_sasa)
 
         #self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:int(x[0][3:-1])) # sorted by residue number
-        self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:x[1]) # sorted by sigma 
+        #self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:x[1]) # sorted by sigma 
 
-    def run(self):
-        self.run_SASA()
-        self.to_rSASA()
-    
     def predict(self, verbose=False):
         '''
         From RSASA, it predicts high score aromatic residues
         '''
         self.generate_cryptic_site_index()
 
+    def output_pdb_w_index(self):
+        u = Universe(self.__ref)        
+        #initialize the b-factor column
+        u.atoms.tempfactors = 0
+        for icalpha in u.atoms.select_atoms('name CA'):
+            if icalpha.resname in ['PHE','TRP','TYR','HIS']:
+                 key = icalpha.resname + str(icalpha.resid) + self.chain
+                 #print(key)
+                 DF    = self.cryptic_index[key][0]
+                 sigma = self.cryptic_index[key][1]
+
+                 if np.abs(DF) < self.__alpha:
+                     print(key, DF, sigma)
+                 #icalpha.tempfactor)
+                     icalpha.tempfactor = sigma
+
+        u.select_atoms('protein').write('index.pdb')
+
 def main():
     CSP = CrypticSitePredictor()
     CSP.print_info()
     CSP.run()
     CSP.predict()
-    print(CSP.cryptic_index)
+    #print(CSP.cryptic_index)
+    CSP.output_pdb_w_index()
+    
 #    CSP.df_rsasa.to_csv('rsasa.csv')
+#    self.cryptic_index[]
 
 if __name__ == '__main__':
     main()
