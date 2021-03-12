@@ -26,7 +26,7 @@ class CrypticSitePredictor():
         self.__trj_range                  = args.trj_range
         self.__traj_data = md.load(self.__traj, top = self.__ref)
 
-    def info(self):
+    def print_info(self):
         info = f''' 
         Reference: {self.__ref}
         Traj     : {self.__traj}
@@ -86,6 +86,7 @@ class CrypticSitePredictor():
 
 def main():
     CSP = CrypticSitePredictor()
-    CSP.info()
+    CSP.print_info()
+    
 if __name__ == '__main__':
     main()
