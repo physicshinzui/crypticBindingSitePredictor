@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from MDAnalysis import Universe
 import mdtraj as md
 import numpy as np
