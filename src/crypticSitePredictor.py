@@ -212,7 +212,7 @@ class CrypticSitePredictor():
                      print(key, DF, sigma)
                      icalpha.tempfactor = sigma * scale_factor
 
-        u.select_atoms('protein').write('index_{self.__out_suffix}.pdb')
+        u.select_atoms('protein').write(f'index_{self.__out_suffix}.pdb')
 
 def main():
     CSP = CrypticSitePredictor()
