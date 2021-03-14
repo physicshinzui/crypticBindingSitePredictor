@@ -76,10 +76,10 @@ class CrypticSitePredictor():
         print(len(sasa_matrix[0,:]))
         
         ### Save a table storing sasa values
-        self.df_sasa = pd.DataFrame(sasa_matrix).round(4)
-        self.df_sasa.columns = keys    
-        self.df_sasa.index.name = 'Frame No'
-        self.df_sasa.to_csv(f'sasa_{self.__out_suffix}.csv')
+        self.__df_sasa = pd.DataFrame(sasa_matrix).round(4)
+        self.__df_sasa.columns = keys    
+        self.__df_sasa.index.name = 'Frame No'
+        self.__df_sasa.to_csv(f'sasa_{self.__out_suffix}.csv')
 
     def to_rSASA(self):
         # The values were computed by mdtraj's sasa class.
@@ -122,7 +122,7 @@ class CrypticSitePredictor():
  
             return rsasa
  
-        self.df_rsasa = self.df_sasa.apply(to_rSASA_each_series)
+        self.df_rsasa = self.__df_sasa.apply(to_rSASA_each_series)
 
     def ratio_RbRe(self, rSASA, buried_upper_limit):
         """
@@ -219,11 +219,9 @@ def main():
     CSP.print_info()
     CSP.run()
     CSP.predict()
-    #print(CSP.cryptic_index)
     CSP.output_pdb_w_index()
     
 #    CSP.df_rsasa.to_csv('rsasa.csv')
-#    self.cryptic_index[]
 
 if __name__ == '__main__':
     main()
