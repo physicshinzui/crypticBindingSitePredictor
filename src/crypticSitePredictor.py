@@ -194,6 +194,10 @@ class CrypticSitePredictor():
         self.generate_cryptic_site_index()
 
     def output_pdb_w_index(self):
+        #This scales sigma. The reason for this is because PDB files accepts few significant digits/
+        # sigma is usually 10^2 ~ 10^3 order, so if sigma was 0.011, then the sigma value to be written would be 0.01 in the PDB. I want to avoid this. 
+        scale_factor = 100.0 
+
         u = Universe(self.__ref)        
         #initialize the b-factor column
         u.atoms.tempfactors = 0
@@ -206,8 +210,7 @@ class CrypticSitePredictor():
 
                  if np.abs(DF) < self.__alpha:
                      print(key, DF, sigma)
-                 #icalpha.tempfactor)
-                     icalpha.tempfactor = sigma
+                     icalpha.tempfactor = sigma * scale_factor
 
         u.select_atoms('protein').write('index_{self.__out_suffix}.pdb')
 
