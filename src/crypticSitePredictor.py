@@ -124,6 +124,7 @@ class CrypticSitePredictor():
             return rsasa
  
         df_rsasa = df_sasa.apply(to_rSASA_each_series)
+        df_rsasa.to_csv(f'rsasa_{self.__out_suffix}.csv')        
         return df_rsasa
 
     def ratio_RbRe(self, rSASA, buried_upper_limit):
@@ -204,9 +205,9 @@ class CrypticSitePredictor():
                  #print(key)
                  DF    = self.cryptic_index[key][0]
                  sigma = self.cryptic_index[key][1]
-
+                 print(DF, sigma)
                  if np.abs(DF) < self.__alpha:
-                     print(key, DF, sigma)
+#                     print(key, DF, sigma)
                      icalpha.tempfactor = sigma * scale_factor
 
         u.select_atoms('protein').write(f'index_{self.__out_suffix}.pdb')
