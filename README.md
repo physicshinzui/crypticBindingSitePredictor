@@ -6,7 +6,7 @@ Author: Shinji Iida
 
 
 # Installation
-
+`export PATH=${PATH}:path_to_/crypticSitePredictor/src`
 
 # Methods
 

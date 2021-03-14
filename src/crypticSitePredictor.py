@@ -9,7 +9,7 @@ def parser():
     p = argparse.ArgumentParser(description='This is Cryptic-site predictor')
     p.add_argument('-r' , '--ref'      , required = True  , help = '')
     p.add_argument('-i' , '--trj'      , required = True  , help = '')
-    p.add_argument('-o' , '--out'      , required = False , help = 'output name'           , type=str  , default = 'cryptic_site_index.csv')    
+    p.add_argument('-o' , '--out'      , required = False , help = 'output suffix'         , type=str  , default = 'cryptic')    
     p.add_argument('-a' , '--alpha'    , required = False , help = 'Upper bound of Delta F', type=float, default = 2.0 )
     p.add_argument('-b' , '--beta'     , required = False , help = 'Lower bound of sigma'  , type=float, default = 0.0)
     p.add_argument('-th', '--threshold', required = False , help = 'threshold'             , type=float, default = 0.75)
@@ -23,19 +23,19 @@ class CrypticSitePredictor():
         args = parser()
         self.__ref      , self.__traj     = args.ref, args.trj
         self.__alpha    , self.__beta     = args.alpha, args.beta
-        self.__threshold, self.__out_name = args.threshold, args.out
+        self.__threshold, self.__out_suffix = args.threshold, args.out
         self.__trj_range                  = args.trj_range
         self.__traj_data = md.load(self.__traj, top = self.__ref)
 
     def print_info(self):
         info = f''' 
-        Reference: {self.__ref}
-        Traj     : {self.__traj}
-        alpha    : {self.__alpha}
-        beta     : {self.__beta}
-        shreshold: {self.__threshold}
-        Output   : {self.__out_name}
-        Trj Range: {self.__trj_range}
+        Reference      : {self.__ref}
+        Traj           : {self.__traj}
+        alpha          : {self.__alpha}
+        beta           : {self.__beta}
+        shreshold      : {self.__threshold}
+        Output suffix  : {self.__out_suffix}
+        Trj Range      : {self.__trj_range}
         '''
         print(info)
 
@@ -79,7 +79,7 @@ class CrypticSitePredictor():
         self.df_sasa = pd.DataFrame(sasa_matrix).round(4)
         self.df_sasa.columns = keys    
         self.df_sasa.index.name = 'Frame No'
-        #self.df_sasa.to_csv('sasa.csv')
+        self.df_sasa.to_csv(f'sasa_{self.__out_suffix}.csv')
 
     def to_rSASA(self):
         # The values were computed by mdtraj's sasa class.
