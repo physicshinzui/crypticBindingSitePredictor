@@ -35,7 +35,7 @@ class CrypticSitePredictor():
         beta           : {self.__beta}
         shreshold      : {self.__threshold}
         Output suffix  : {self.__out_suffix}
-        Trj Range      : {self.__trj_range}
+        Trj Range      : {self.__trj_range} (Currently Inactive)
         '''
         print(info)
 
@@ -202,10 +202,9 @@ class CrypticSitePredictor():
         for icalpha in u.atoms.select_atoms('name CA'):
             if icalpha.resname in ['PHE','TRP','TYR','HIS']:
                  key = icalpha.resname + str(icalpha.resid) + self.chain
-                 #print(key)
                  DF    = self.cryptic_index[key][0]
                  sigma = self.cryptic_index[key][1]
-                 print(DF, sigma)
+                 print(key, DF, sigma)
                  if np.abs(DF) < self.__alpha:
 #                     print(key, DF, sigma)
                      icalpha.tempfactor = sigma * scale_factor
