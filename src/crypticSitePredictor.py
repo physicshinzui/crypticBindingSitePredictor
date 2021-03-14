@@ -76,12 +76,13 @@ class CrypticSitePredictor():
         print(len(sasa_matrix[0,:]))
         
         ### Save a table storing sasa values
-        self.__df_sasa = pd.DataFrame(sasa_matrix).round(4)
-        self.__df_sasa.columns = keys    
-        self.__df_sasa.index.name = 'Frame No'
-        self.__df_sasa.to_csv(f'sasa_{self.__out_suffix}.csv')
+        df_sasa            = pd.DataFrame(sasa_matrix).round(4)
+        df_sasa.columns    = keys    
+        df_sasa.index.name = 'Frame No'
+        df_sasa.to_csv(f'sasa_{self.__out_suffix}.csv')
+        return df_sasa
 
-    def to_rSASA(self):
+    def to_rSASA(self, df_sasa):
         # The values were computed by mdtraj's sasa class.
         # unit, nm^2
         # Note: Relative SASAs of non-aromatic residues are NOT computed.
@@ -122,7 +123,8 @@ class CrypticSitePredictor():
  
             return rsasa
  
-        self.df_rsasa = self.__df_sasa.apply(to_rSASA_each_series)
+        df_rsasa = df_sasa.apply(to_rSASA_each_series)
+        return df_rsasa
 
     def ratio_RbRe(self, rSASA, buried_upper_limit):
         """
@@ -155,10 +157,11 @@ class CrypticSitePredictor():
         return Rbe
     
     def run(self):
-        self.run_SASA()
-        self.to_rSASA()
+        df_sasa  = self.run_SASA()
+        df_rsasa = self.to_rSASA(df_sasa)
+        self.generate_cryptic_site_index(df_rsasa)
 
-    def generate_cryptic_site_index(self):
+    def generate_cryptic_site_index(self, df_rsasa):
         """
             df_rsasa: dataframe (e.g., {PHE1:0.4, TYR2:0.2,...})
             self.cryptic_index: [dict] delta F and sigma are assigned to each aromatic residue
@@ -166,12 +169,12 @@ class CrypticSitePredictor():
         """
         S_aromatic_resname = set(['PHE','TRP','TYR','HIS'])
         self.cryptic_index = {}
-        for key in self.df_rsasa:
+        for key in df_rsasa:
 
             if key[0:3] in S_aromatic_resname:
 
                 # -- Calculate the ratio (Rbe) of buried to exposed states
-                Rbe = self.ratio_RbRe(self.df_rsasa[key], self.__threshold)
+                Rbe = self.ratio_RbRe(df_rsasa[key], self.__threshold)
                 RT = 0.59 # at 300 K
                 
                 if Rbe == np.inf:
@@ -180,18 +183,12 @@ class CrypticSitePredictor():
                 else:
                     dF = - RT * np.log(Rbe)
 
-                std_sasa = np.std(self.df_rsasa[key])
+                std_sasa = np.std(df_rsasa[key])
                 
                 self.cryptic_index[key] = (dF, std_sasa)
 
         #self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:int(x[0][3:-1])) # sorted by residue number
         #self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:x[1]) # sorted by sigma 
-
-    def predict(self, verbose=False):
-        '''
-        From RSASA, it predicts high score aromatic residues
-        '''
-        self.generate_cryptic_site_index()
 
     def output_pdb_w_index(self):
         #This scales sigma. The reason for this is because PDB files accepts few significant digits/
@@ -218,7 +215,6 @@ def main():
     CSP = CrypticSitePredictor()
     CSP.print_info()
     CSP.run()
-    CSP.predict()
     CSP.output_pdb_w_index()
     
 #    CSP.df_rsasa.to_csv('rsasa.csv')

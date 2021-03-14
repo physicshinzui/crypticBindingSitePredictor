@@ -3,3 +3,5 @@ src/*.csv
 src/*.pdb
 *.pdb
 *.csv
+*.ipynb
+.ipynb_checkpoints/
