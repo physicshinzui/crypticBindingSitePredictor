@@ -23,7 +23,7 @@ class CrypticSitePredictor():
         args = parser()
         self.__ref      , self.__traj     = args.ref, args.trj
         self.__alpha    , self.__beta     = args.alpha, args.beta
-        self.__threshold, self.__out_suffix = args.threshold, args.out
+        self.__upper_lim_of_buried_state, self.__out_suffix = args.threshold, args.out
         self.__trj_range                  = args.trj_range
         self.__traj_data = md.load(self.__traj, top = self.__ref)
 
@@ -33,7 +33,7 @@ class CrypticSitePredictor():
         Traj           : {self.__traj}
         alpha          : {self.__alpha}
         beta           : {self.__beta}
-        shreshold      : {self.__threshold}
+        shreshold      : {self.__upper_lim_of_buried_state}
         Output suffix  : {self.__out_suffix}
         Trj Range      : {self.__trj_range} (Currently Inactive)
         '''
@@ -175,7 +175,7 @@ class CrypticSitePredictor():
             if key[0:3] in S_aromatic_resname:
 
                 # -- Calculate the ratio (Rbe) of buried to exposed states
-                Rbe = self.ratio_RbRe(df_rsasa[key], self.__threshold)
+                Rbe = self.ratio_RbRe(df_rsasa[key], self.__upper_lim_of_buried_state)
                 RT = 0.59 # at 300 K
                 
                 if Rbe == np.inf:
