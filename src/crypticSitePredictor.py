@@ -12,7 +12,7 @@ def parser():
     p.add_argument('-o' , '--out'      , required = False , help = 'output suffix'         , type=str  , default = 'cryptic')    
     p.add_argument('-a' , '--alpha'    , required = False , help = 'Upper bound of Delta F', type=float, default = 2.0 )
     p.add_argument('-b' , '--beta'     , required = False , help = 'Lower bound of sigma'  , type=float, default = 0.0)
-    p.add_argument('-th', '--threshold', required = False , help = 'threshold'             , type=float, default = 0.75)
+    p.add_argument('-th', '--threshold', required = False , help = 'threshold'             , type=float, default = 0.075)
     p.add_argument('-tr', '--trj_range', required = False , help = 'traj range'            , type=int  , default = [0,-1], nargs='+')    
     args = p.parse_args()
     return args
