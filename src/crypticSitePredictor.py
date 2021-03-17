@@ -204,7 +204,7 @@ class CrypticSitePredictor():
         u.atoms.tempfactors = 0
         for icalpha in u.atoms.select_atoms('name CA'):
             if icalpha.resname in ['PHE','TRP','TYR','HIS']:
-                 key = icalpha.resname + str(icalpha.resid) + self.chain
+                 key = icalpha.resname + str(icalpha.resid) + icalpha.segid
                  DF    = self.cryptic_index[key][0]
                  sigma = self.cryptic_index[key][1]
                  print(key, DF, sigma)
