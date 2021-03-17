@@ -190,7 +190,7 @@ class CrypticSitePredictor():
                 std_sasa = np.std(df_rsasa[key])
                 
                 self.cryptic_index[key] = (dF, std_sasa)
-        pd.DataFrame.from_dict(self.cryptic_index, orient='index').to_csv(f'deltaF_sigma{self.__out_suffix}.csv')
+        pd.DataFrame.from_dict(self.cryptic_index, orient='index', columns = ['DF', 'sigma']).to_csv(f'deltaF_sigma_{self.__out_suffix}.csv')
 
         #self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:int(x[0][3:-1])) # sorted by residue number
         #self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:x[1]) # sorted by sigma 
