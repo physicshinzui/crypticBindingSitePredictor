@@ -58,7 +58,10 @@ class CrypticSitePredictor():
             print(f'n chains = {nchains}')
             for chain, resn, resi in zip(u.residues.segids, u.residues.resnames, u.residues.resids):
             
-                if chain == 'SYSTEM': self.chain = chain.replace('SYSTEM', 'A') # self.chain should have default vaule in __init__
+                if chain == 'SYSTEM': 
+                    self.chain = chain.replace('SYSTEM', 'A') # self.chain should have default vaule in __init__
+                else:
+                    self.chain = chain
                  
                 residue_tags.append(resn + str(resi) + self.chain)
             
