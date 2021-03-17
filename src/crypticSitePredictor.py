@@ -2,6 +2,7 @@
 from MDAnalysis import Universe
 import mdtraj as md
 import numpy as np
+import pandas as pd
 np.seterr(divide = 'ignore')
 import argparse
 
@@ -40,7 +41,6 @@ class CrypticSitePredictor():
         print(info)
 
     def run_SASA(self):
-        import pandas as pd
         PROBE_RADIUS, N_SPHERE_POINTS = 0.14, 100
         print(self.__traj_data)
 
@@ -190,6 +190,7 @@ class CrypticSitePredictor():
                 std_sasa = np.std(df_rsasa[key])
                 
                 self.cryptic_index[key] = (dF, std_sasa)
+        pd.DataFrame.from_dict(self.cryptic_index, orient='index').to_csv(f'deltaF_sigma{self.__out_suffix}.csv')
 
         #self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:int(x[0][3:-1])) # sorted by residue number
         #self.cryptic_index = sorted(self.cryptic_index.items(), key=lambda x:x[1]) # sorted by sigma 
@@ -204,7 +205,7 @@ class CrypticSitePredictor():
         u.atoms.tempfactors = 0
         for icalpha in u.atoms.select_atoms('name CA'):
             if icalpha.resname in ['PHE','TRP','TYR','HIS']:
-                 key = icalpha.resname + str(icalpha.resid) + icalpha.segid
+                 key = icalpha.resname + str(icalpha.resid) + icalpha.segid.replace('SYSTEM', 'A')
                  DF    = self.cryptic_index[key][0]
                  sigma = self.cryptic_index[key][1]
                  print(key, DF, sigma)
