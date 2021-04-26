@@ -2,10 +2,10 @@
 Author: Shinji Iida
 
 # Requirements
-MDAnalysis >= 1.0.0 (https://www.mdanalysis.org/)
-mdtraj     >= 1.9.4 (https://www.mdtraj.org/1.9.4/index.html#)
-pandas     >= 1.1.3
-python     >= 3.6
+- MDAnalysis >= 1.0.0 (https://www.mdanalysis.org/)
+- mdtraj     >= 1.9.4 (https://www.mdtraj.org/1.9.4/index.html#)
+- pandas     >= 1.1.3
+- python     >= 3.6
 
 # Installation
 `export PATH=${PATH}:path_to_/crypticSitePredictor/src`
